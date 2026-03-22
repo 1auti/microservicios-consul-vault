@@ -5,9 +5,9 @@ spring:
   config:
    server:
     git:
-       uri: https://github.com/1auti/microservices-config
-       default-label: main
-       force-pull: true
+     uri: https://github.com/1auti/microservices-config
+     default-label: main
+     force-pull: true
 
 server:
   port: 8888
