@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: eureka-server
+
+server:
+  port: 8761  # Puerto estándar de Eureka
+
+eureka:
+  client:
+    # Eureka no se registra a sí mismo — él ES el registro
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    # Tiempo de espera antes de eliminar servicios caídos (en ms)
+    # En desarrollo lo bajamos para no esperar tanto
+    eviction-interval-timer-in-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

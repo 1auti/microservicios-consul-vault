@@ -3,8 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<!-- Apunta al pom padre del proyecto en lugar de spring-boot-starter-parent -->
-	<!-- Hereda: versiones de Spring Boot, Spring Cloud, Java 21, encoding, etc. -->
+	<!-- Apunta al pom padre del proyecto -->
 	<parent>
 		<groupId>com.lautaro</groupId>
 		<artifactId>microservice-consult-vault</artifactId>
@@ -12,37 +11,23 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>config-service</artifactId>
-	<name>config-service</name>
+	<artifactId>eureka-server</artifactId>
+	<name>eureka-server</name>
 
-	<!-- No necesita groupId ni version — los hereda del padre -->
+	<!-- groupId, version, properties y dependencyManagement heredados del padre -->
 
 	<dependencies>
 
-		<!-- Config Server: sirve las configuraciones desde el repo Git -->
+		<!-- Eureka Server: convierte este servicio en el registro de microservicios -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-config-server</artifactId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 
-		<!-- Eureka Client: registra este servicio en el servidor Eureka -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-
-		<!-- Actuator: expone /actuator/health, /actuator/info, etc. -->
+		<!-- Actuator: expone /actuator/health, /actuator/info -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-
-		<!-- DevTools: reinicio automático al cambiar código (solo desarrollo) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
 		</dependency>
 
 		<!-- Test: dependencia estándar para tests unitarios -->
@@ -53,8 +38,6 @@
 		</dependency>
 
 	</dependencies>
-
-	<!-- dependencyManagement eliminado — lo hereda del pom padre -->
 
 	<build>
 		<plugins>
