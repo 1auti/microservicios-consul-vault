@@ -5,12 +5,30 @@ spring:
   config:
    server:
     git:
-     uri: https://github.com/1auti/microservices-config
-     default-label: main
-     force-pull: true
+     uri: https://github.com/1auti/microservices-config # Repositorio Git donde se encuentran los archivos de configuración
+     default-label: main # Rama por defecto del repositorio Git
+     force-pull: true # Fuerza a Spring Cloud Config Server a hacer un pull del repositorio Git cada vez que se inicia, asegurando que siempre tenga la última versión de los archivos de configuración 
+     basedir: /tmp/config-repo # Directorio dentro del repositorio Git donde se encuentran los archivos de configuración . En Docker eso queda en el contenedor
+
+
 
 server:
   port: 8888
+
+# Registro del config server para que los demas servicios lo encuentren
+eureka:
+ client:
+  service-url:
+   defaultZone: ${EUREKA.URI:http://localhost:8761/eureka/} # URL del servidor de descubrimiento (Eureka) donde se registrará este servicio de configuración
+ instance:
+  prefer-ip-address: true # Configura el servicio para que se registre con su dirección IP en lugar de su nombre de host, lo que puede ser útil en entornos de contenedores como Docker
+
+
+management:
+ endpoints:
+  web:
+   exposure:
+    include: health, info, refresh # Exponer los endpoints de salud, información y refresh para monitoreo y administración del servicio de configuración
 
 
  
