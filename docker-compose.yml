@@ -53,6 +53,56 @@ services:
       config-server:
         condition: service_healthy
 
+  users-service:
+    build:
+      context: .
+      dockerfile: users-service/Dockerfile
+    container_name: users-service
+    ports:
+      - "8081:8081"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URI: http://config-server:8888
+      DB_URL: jdbc:postgresql://users-db:5432/users_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    networks:
+      - microservices-net
+    depends_on:
+      config-server:
+        condition: service_healthy
+      users-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8081/actuator/health" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  users-db:
+    image: postgres:16-alpine
+    container_name: users-db
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - users-db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 networks:
   microservices-net:
     driver: bridge
+
+volumes:
+  users-db-data: # Para persistir los datos de la base de datos de usuarios

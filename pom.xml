@@ -17,6 +17,7 @@
         <module>eureka-server</module>
         <module>config-service</module>
         <module>gateway-service</module>
+        <module>users-service</module>
     </modules>
 
     <properties>
@@ -24,7 +25,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-boot.version>3.5.12</spring-boot.version>
+        <spring-boot.version>3.5.13</spring-boot.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
 
