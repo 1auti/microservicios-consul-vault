@@ -99,10 +99,62 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+  cliente-service:
+    build:
+      context: .
+      dockerfile: cliente-service/Dockerfile
+    container_name: cliente-service
+    ports:
+      - "8082:8082"
+    environment:
+      EUREKA_URI: http://eureka-server:8761/eureka/
+      CONFIG_SERVER_URI: http://config-server:8888
+      DB_URL: jdbc:postgresql://clientes-db:5432/clientes_db
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    networks:
+      - microservices-net
+    depends_on:
+      config-server:
+        condition: service_healthy
+      clientes-db:
+        condition: service_healthy
+      # Depende de users-service porque Feign lo llama al consultar clientes
+      users-service:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8082/actuator/health" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  clientes-db:
+    image: postgres:16-alpine
+    container_name: clientes-db
+    environment:
+      POSTGRES_DB: clientes_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - clientes-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - microservices-net
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
 networks:
   microservices-net:
     driver: bridge
 
+# Para persistir los datos de la base de datos de clientes
 volumes:
-  users-db-data: # Para persistir los datos de la base de datos de usuarios
+  users-db-data:
+  clientes-db-data:
+
+

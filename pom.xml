@@ -18,6 +18,7 @@
         <module>config-service</module>
         <module>gateway-service</module>
         <module>users-service</module>
+        <module>cliente-service</module>
     </modules>
 
     <properties>
