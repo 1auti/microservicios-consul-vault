@@ -3,7 +3,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-
 	<parent>
 		<groupId>com.lautaro</groupId>
 		<artifactId>microservice-consult-vault</artifactId>
@@ -14,75 +13,65 @@
 	<artifactId>cliente-service</artifactId>
 	<name>cliente-service</name>
 
-	<!-- groupId, version, java.version, spring-cloud.version heredados del padre -->
+	<properties>
+		<!-- Versión centralizada — si actualizás MapStruct, cambiás acá solo -->
+		<mapstruct.version>1.5.5.Final</mapstruct.version>
+	</properties>
 
 	<dependencies>
 
-		<!-- Web: expone los endpoints REST -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- JPA: acceso a base de datos con Hibernate -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!--
-			Validation: permite usar @NotNull, @Email, @Size en los DTOs.
-			users-service no lo tenía — acá lo agregamos porque vamos a
-			validar los datos de entrada en ClienteRequestDTO.
-		-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- PostgreSQL: driver de la base de datos -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Eureka Client: se registra para que el Gateway lo encuentre -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 
-		<!-- Config Client: obtiene su config del Config Server -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
 
-		<!--
-			OpenFeign: permite llamar a users-service como si fuera
-			un método Java local. Lo usamos para consultar el usuario
-			asociado a un cliente.
-		-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
-		<!-- Actuator: expone /actuator/health para Eureka y Docker healthcheck -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
-		<!--
-			Lombok: reduce boilerplate.
-			Misma versión y configuración que users-service.
-		-->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.32</version>
+		</dependency>
+
+		<!-- MapStruct: solo necesaria en compile, no en runtime -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
 		</dependency>
 
 		<dependency>
@@ -91,27 +80,45 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
 
-			<!-- Lombok como annotation processor: igual que users-service -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<annotationProcessorPaths>
+
+						<!-- Lombok primero — debe procesar antes que MapStruct -->
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>1.18.32</version>
 						</path>
+
+						<!--
+							MapStruct processor — genera la implementación de ClienteMapper
+							en target/generated-sources en tiempo de compilación.
+							Si este processor no está, la interfaz nunca se implementa
+							y Spring no puede crear el bean → NoSuchBeanDefinitionException.
+						-->
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${mapstruct.version}</version>
+						</path>
+
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
-			<!-- Spring Boot plugin: genera el JAR ejecutable -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
